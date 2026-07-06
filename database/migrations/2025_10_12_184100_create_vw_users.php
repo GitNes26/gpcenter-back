@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        DB::statement(
+            "CREATE OR REPLACE VIEW vw_users AS 
+            SELECT u.*, r.role, r.read, r.create, r.update, r.delete, r.more_permissions, r.page_index, e.employee_code,
+            e.avatar,e.name, e.plast_name, e.mlast_name, e.cellphone, e.position_office_phone, e.position_ext, e.signature_image, e.position_uuid, e.department_uuid, e.full_name, e.full_name_reverse, e.position_name, e.department_name
+            FROM users u 
+            INNER JOIN roles r ON u.role_id=r.id
+            LEFT JOIN vw_employees_gpc e ON u.gpc_employee_id=e.employee_id
+            ;"
+        );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        DB::statement('DROP VIEW IF EXISTS vw_users');
+    }
+};

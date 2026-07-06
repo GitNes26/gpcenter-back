@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class Controller extends BaseController
+{
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    /**
+     * Funcion para guardar imagenes acorde al modelo.
+     * @param Request $request
+     * @param File $requestFile
+     * @param String $dirPath
+     * @param Number $id
+     * @param String $PosFix
+     * @param Boolean $create
+     * @param String $nameFake
+     * 
+     * @return string
+     */
+    public function ImageUp($request, $requestFileName, $dirPath, $model, $posFix, $create, $nameFake)
+    {
+        try {
+            $dir = public_path($dirPath);
+            $img_name = "";
+            if ($request->hasFile($requestFileName)) {
+
+                $img_file = $request->file($requestFileName);
+                $dir_path = "$dirPath/$model->id";
+                $destination = "$dir/$model->id";
+                $img_name = $this->ImgUpload($img_file, $destination, $dir_path, "$model->id-$posFix");
+            } else {
+                if ($create) $img_name = "$dirPath/$nameFake";
+            }
+
+            if ($request->hasFile($requestFileName)) {
+                $model->$requestFileName = $img_name;
+                $model->save();
+            }
+            // return $img_name;
+        } catch (\Exception $ex) {
+            $msg =  "Error al cargar imagen de documentos data: " . $ex->getMessage();
+            Log::error($msg);
+            return "$msg";
+        }
+    }
+
+
+    /**
+     * Funcion para guardar una imagen en directorio fisico, elimina y guarda la nueva al editar la imagen para no guardar muchas
+     * imagenes y genera el path que se guardara en la BD
+     * 
+     * @param $image File es el archivo de la imagen
+     * @param $destination String ruta donde se guardara fisicamente el archivo
+     * @param $dir String ruta que mandara a la BD
+     * @param $imgName String Nombre de como se guardará el archivo fisica y en la BD
+     */
+    public function ImgUpload($image, $destination, $dir, $imgName)
+    {
+        try {
+            // return "ImgUpload->aqui todo bien";
+            $type = "JPG";
+            $permissions = 0777;
+
+            if (file_exists("$dir/$imgName.PNG")) {
+                // Establecer permisos
+                if (chmod("$dir/$imgName.PNG", $permissions)) {
+                    @unlink("$dir/$imgName.PNG");
+                }
+                $type = "JPG";
+            } elseif (file_exists("$dir/$imgName.JPG")) {
+                // Establecer permisos
+                if (chmod("$dir/$imgName.JPG", $permissions)) {
+                    @unlink("$dir/$imgName.JPG");
+                }
+                $type = "PNG";
+            }
+            $imgName = "$imgName.$type";
+            $image->move($destination, $imgName);
+            return "$dir/$imgName";
+        } catch (\Error $err) {
+            $msg = "error en imgUpload(): " . $err->getMessage();
+            Log::error($msg);
+            return "$msg";
+        }
+    }
+
+
+    /**
+     * Funcion para guardar una imagen en directorio fisico, elimina y guarda la nueva al editar la imagen para no guardar muchas
+     * imagenes y genera el path que se guardara en la BD
+     * 
+     * @param $image File es el archivo de la imagen
+     * @param $destination String ruta donde se guardara fisicamente el archivo
+     * @param $dir String ruta que mandara a la BD
+     * @param $imgName String Nombre de como se guardará el archivo fisica y en la BD
+     */
+    public function smImgUpload(Request $request)
+    {
+        try {
+            // return "ImgUpload->aqui todo bien";
+            $dir = public_path($request->dirPath);
+            if (!$request->hasFile($request->requestFileName)) {
+                $msg = "no hay archivo en smImgUpload(): ";
+                Log::error($msg);
+                return "$msg";
+            }
+            $img_file = $request->file($request->requestFileName);
+            // $dir_path = "$request->dirPath/$request->dirDestination";
+            $destination = "$dir/$request->dirDestination";
+            // $this->ImgUpload($img_file, $destination, $dir_path, "$model->id-$posFix");
+
+
+            $type = "JPG";
+            $permissions = 0777;
+
+            // if (file_exists("$dir/$request->imgName.PNG")) {
+            //     // Establecer permisos
+            //     if (chmod("$dir/$request->imgName.PNG", $permissions)) {
+            //         @unlink("$dir/$request->imgName.PNG");
+            //     }
+            //     $type = "JPG";
+            // } elseif (file_exists("$dir/$request->imgName.JPG")) {
+            //     // Establecer permisos
+            //     if (chmod("$dir/$request->imgName.JPG", $permissions)) {
+            //         @unlink("$dir/$request->imgName.JPG");
+            //     }
+            //     $type = "PNG";
+            // }
+            // $imgName = "$request->imgName.$type";
+            $imgName = $request->imgName;
+            $img_file->move($destination, $imgName);
+            return "$dir/$imgName";
+        } catch (\Error $err) {
+            $msg = "error en smImgUpload(): " . $err->getMessage();
+            Log::error($msg);
+            return "$msg";
+        }
+    }
+
+    /**
+     * Funcion para verificar que los datos NO se dupliquen en las tablas correspondientes.
+     * 
+     * @return ObjRespnse|false
+     */
+    public function checkAvailableData($table, $column, $value, $propTitle, $input, $id, $secondTable = null, $complementInfo = false)
+    {
+        if ($complementInfo) {
+            $query = "SELECT count(*) as duplicate FROM $table WHERE $column='$value'";
+            if ($id != null) $query .= " AND id!=$id";
+        } elseif ($secondTable) {
+            $query = "SELECT count(*) as duplicate FROM $table INNER JOIN $secondTable ON rol_id=rols.id WHERE $column='$value' AND active=1;";
+            if ($id != null) $query = "SELECT count(*) as duplicate FROM $table t INNER JOIN $secondTable ON t.rol_id=rols.id WHERE t.$column='$value' AND active=1 AND t.id!=$id";
+        } else {
+            $query = "SELECT count(*) as duplicate FROM $table WHERE $column='$value' AND active=1";
+            if ($id != null) $query .= " AND id!=$id";
+        }
+        // Log::info("Controller ~ checkAvailableData ~ query: " . $query);
+        $result = DB::select($query)[0];
+        //   var_dump($result->duplicate);
+        if ((int)$result->duplicate > 0) {
+            // echo "entro al duplicate";
+            $response = array(
+                "result" => true,
+                "status_code" => 409,
+                "alert_icon" => 'warning',
+                "alert_title" => "$propTitle no esta disponible!",
+                "alert_text" => "$propTitle no esta disponible! - $value ya existe, intenta con uno diferente.",
+                "message" => "duplicate",
+                "input" => $input,
+                "toast" => false
+            );
+        } else {
+            $response = array(
+                "result" => false,
+            );
+        }
+        return $response;
+    }
+}
