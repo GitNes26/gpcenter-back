@@ -22,8 +22,8 @@ return new class extends Migration
         //     // $table->text('others_permissions')->nullable();
         //     $table->string('avatar')->nullable();
         //     $table->string('name');
-        //     $table->string('paternal_last_name');
-        //     $table->string('maternal_last_name');
+        //     $table->string('plast_name');
+        //     $table->string('mlast_name');
         //     $table->string('cellphone')->nullable();
         //     $table->string('license_number')->nullable();
         //     $table->string('license_type')->nullable();

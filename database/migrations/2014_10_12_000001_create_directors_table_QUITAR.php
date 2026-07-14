@@ -18,8 +18,8 @@ return new class extends Migration
         //     $table->foreignId('user_id')->constrained('users', 'id');
         //     $table->string('avatar')->nullable();
         //     $table->string('name');
-        //     $table->string('paternal_last_name');
-        //     $table->string('maternal_last_name');
+        //     $table->string('plast_name');
+        //     $table->string('mlast_name');
         //     $table->string('cellphone');
         //     $table->string('license_number');
         //     $table->string('license_type');

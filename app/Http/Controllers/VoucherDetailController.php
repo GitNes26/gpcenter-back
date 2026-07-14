@@ -21,7 +21,7 @@ class VoucherDetailController extends Controller
     {
         $response->data = ObjResponse::DefaultResponse();
         try {
-            $list = VoucherDetail::where('active', 1)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.paternal_last_name,' ',voucher_details.maternal_last_name) 'creditor_fullname'")->get();
+            $list = VoucherDetail::where('active', 1)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.plast_name,' ',voucher_details.mlast_name) 'creditor_fullname'")->get();
 
             if ($internal === true) return $list;
 
@@ -45,7 +45,7 @@ class VoucherDetailController extends Controller
     {
         $response->data = ObjResponse::DefaultResponse();
         try {
-            $list = VoucherDetail::where('active', 1)->where("voucher_id", $id)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.paternal_last_name,' ',voucher_details.maternal_last_name) 'creditor_fullname'")->get();
+            $list = VoucherDetail::where('active', 1)->where("voucher_id", $id)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.plast_name,' ',voucher_details.mlast_name) 'creditor_fullname'")->get();
 
             if ($internal === true) return $list;
 
@@ -68,7 +68,7 @@ class VoucherDetailController extends Controller
     {
         $response->data = ObjResponse::DefaultResponse();
         try {
-            $voucher_detail = VoucherDetail::find($id)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.paternal_last_name,' ',voucher_details.maternal_last_name) 'creditor_fullname'");
+            $voucher_detail = VoucherDetail::find($id)->select('voucher_details.*')->selectRaw("CONCAT(voucher_details.name,' ',voucher_details.plast_name,' ',voucher_details.mlast_name) 'creditor_fullname'");
 
             if ($internal === true) return $voucher_detail;
 
@@ -105,8 +105,8 @@ class VoucherDetailController extends Controller
             $voucher_detail->employee_code = $request->employee_code;
             $voucher_detail->department = $request->department;
             $voucher_detail->name = $request->name;
-            $voucher_detail->paternal_last_name = $request->paternal_last_name;
-            $voucher_detail->maternal_last_name = $request->maternal_last_name;
+            $voucher_detail->plast_name = $request->plast_name;
+            $voucher_detail->mlast_name = $request->mlast_name;
             $voucher_detail->cellphone = $request->cellphone;
 
             $voucher_detail->save();

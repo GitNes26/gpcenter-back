@@ -22,8 +22,8 @@ return new class extends Migration
             $table->integer('employee_code')->nullable();
             $table->string('department')->nullable();
             $table->string('name');
-            $table->string('paternal_last_name');
-            $table->string('maternal_last_name');
+            $table->string('plast_name');
+            $table->string('mlast_name');
             $table->string('cellphone');
 
             $table->boolean('active')->default(true);

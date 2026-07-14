@@ -19,8 +19,8 @@ return new class extends Migration
         //     $table->string('employee_code')->nullable();
         //     $table->string('avatar')->nullable();
         //     $table->string('name');
-        //     $table->string('paternal_last_name');
-        //     $table->string('maternal_last_name');
+        //     $table->string('plast_name');
+        //     $table->string('mlast_name');
         //     $table->string('email')->nullable();
         //     $table->string('cellphone')->nullable();
         //     // $table->string('department');

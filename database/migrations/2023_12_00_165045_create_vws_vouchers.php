@@ -17,7 +17,7 @@ return new class extends Migration
         DB::statement("
         CREATE OR REPLACE VIEW vw_vouchers_prev AS
         SELECT v.*,
-        -- CONCAT(v.name,' ',v.paternal_last_name,' ',v.maternal_last_name) 'creditor_fullname',
+        -- CONCAT(v.name,' ',v.plast_name,' ',v.mlast_name) 'creditor_fullname',
         ua.username 'username_approved', uvb.username 'username_vobo', uv.username 'username_viewed', uc.username 'username_canceled',
         ur.role_id 'requested_role_id', ure.username 'requested_by_name'
         FROM vouchers v

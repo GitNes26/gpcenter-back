@@ -17,7 +17,7 @@ return new class extends Migration
         // DB::statement("
         // CREATE OR REPLACE VIEW active_assignment_view AS
         // SELECT av.id ass_folio, av.vehicle_id ass_vehicle_id, av.active_assignment, av.date ass_date,
-        // dir.id dir_id, dir.username dir_username, dir.email dir_email, dir.avatar dir_avatar, dir.name dir_name, dir.paternal_last_name dir_paternal_last_name, dir.maternal_last_name dir_maternal_last_name,
+        // dir.id dir_id, dir.username dir_username, dir.email dir_email, dir.avatar dir_avatar, dir.name dir_name, dir.plast_name dir_plast_name, dir.mlast_name dir_mlast_name,
         // dir.cellphone dir_cellphone, dir.department dir_department
         // FROM assigned_vehicles av
         // INNER JOIN directors_view dir ON av.user_id=dir.user_id
@@ -29,7 +29,7 @@ return new class extends Migration
         // DB::statement("
         // CREATE OR REPLACE VIEW active_loan_view AS
         // SELECT lv.id loa_folio, lv.assigned_vehicle_id, lv.requesting_user_id, lv.active_loan,
-        // dri.id dri_id, dri.username dri_username, dri.email dri_email, dri.avatar dri_avatar, dri.name dri_name, dri.paternal_last_name dri_paternal_last_name, dri.maternal_last_name dri_maternal_last_name,
+        // dri.id dri_id, dri.username dri_username, dri.email dri_email, dri.avatar dri_avatar, dri.name dri_name, dri.plast_name dri_plast_name, dri.mlast_name dri_mlast_name,
         // dri.cellphone dri_cellphone, dri.department dri_department
         // FROM loaned_vehicles lv
         // INNER JOIN active_assignment_view aav ON lv.assigned_vehicle_id=aav.ass_folio

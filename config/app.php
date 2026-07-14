@@ -124,5 +124,6 @@ return [
     ],
 
     'gpc_api_url' => env('GPC_API_URL', 'https://api.gpcentral.com/api/employee-details/upload-images'),
+    'image_microservice_url' => env('IMAGE_MICROSERVICE_URL', 'https://api.gpcenter.gomezpalacio.gob.mx'),
 
 ];

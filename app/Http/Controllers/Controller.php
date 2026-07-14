@@ -16,6 +16,18 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
+     * API de GPCentral
+     * @var string
+     */
+    protected string $gpcUrl;
+
+    public function __construct()
+    {
+        $this->gpcUrl = config('app.gpc_api_url', 'https://api.gpcentral.gomezpalacio.gob.mx/api');
+    }
+
+
+    /**
      * Funcion para guardar imagenes acorde al modelo.
      * @param Request $request
      * @param File $requestFile

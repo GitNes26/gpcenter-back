@@ -307,15 +307,24 @@ class UserController extends Controller
                ];
             }
          }
-          $gpcUrl = config('app.gpc_api_url', 'https://api.gpcentral.com/api/employees/createOrUpdate');
-          try {
-              $responseGpc = Http::timeout(30)
-                  ->withOptions(['multipart' => $multipart])
-                  ->post($gpcUrl);
-              Log::info("GPCentral upload response: " . $responseGpc->body());
-          } catch (\Exception $e) {
-              Log::warning("GPCentral upload failed: " . $e->getMessage());
-          }
+         // $gpcUrl = config('app.gpc_api_url', 'https://api.gpcentral.gomezpalacio.gob.mx/api');
+         $this->gpcUrl .= '/employees/createOrUpdate';
+         Log::info($this->gpcUrl);
+
+         try {
+            $forwarder = app(\App\Services\RequestForwarderService::class);
+
+            $response = $forwarder->forward(
+               request: $request,
+               url: $this->gpcUrl,
+               override: ['id' => $request->gpc_employee_id],
+               fileFields: ['avatar', 'signature_image', 'seal_image']
+            );
+
+            Log::info('UserController ~ employees/createOrUpdate ~ Respuesta GPCentral: ' . $response->body());
+         } catch (\Exception $e) {
+            Log::warning("UserController ~ createOrUpdate ~ Enviado de Request a GPCentral fallida: " . $e->getMessage());
+         }
 
          $user->save();
 

@@ -86,7 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/users', 'index');
         Route::post('/users/create', 'createOrUpdate');
-        Route::post('/users/update/{id}', 'createOrUpdate');
+        Route::post('/users/update', 'createOrUpdate');
         // Route::post('/users/create/role_id/{role_id}', 'createOrUpdate');
         // Route::post('/users/update/role_id/{role_id}', 'createOrUpdate');
         Route::post('/users/changePasswordAuth', 'changePasswordAuth');

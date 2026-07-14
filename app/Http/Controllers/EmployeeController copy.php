@@ -36,8 +36,8 @@ class EmployeeController extends Controller
 
             $employee->user_id = $user_id;
             $employee->name = $request->name;
-            $employee->paternal_last_name = $request->paternal_last_name;
-            $employee->maternal_last_name = $request->maternal_last_name;
+            $employee->plast_name = $request->plast_name;
+            $employee->mlast_name = $request->mlast_name;
             $employee->cellphone = $request->cellphone;
             $employee->license_number = $request->license_number;
             $employee->license_type = $request->license_type;

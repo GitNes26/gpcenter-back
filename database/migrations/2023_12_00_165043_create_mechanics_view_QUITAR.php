@@ -19,9 +19,9 @@ return new class extends Migration
         // SELECT m.*,
         // CONCAT(m.name,
         //         ' ',
-        //         m.paternal_last_name,
+        //         m.plast_name,
         //         ' ',
-        //         m.maternal_last_name) AS full_name
+        //         m.mlast_name) AS full_name
         // FROM mechanics m
         // -- WHERE m.active=1;
         // ");

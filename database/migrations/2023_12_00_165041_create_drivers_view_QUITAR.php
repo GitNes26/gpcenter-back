@@ -19,9 +19,9 @@ return new class extends Migration
         // SELECT u.id u_id, u.username, u.email, u.role_id, u.active,
         // CONCAT(d.name,
         //         ' ',
-        //         d.paternal_last_name,
+        //         d.plast_name,
         //         ' ',
-        //         d.maternal_last_name) AS full_name, d.*,
+        //         d.mlast_name) AS full_name, d.*,
         // r.role, r.read, r.create, r.update, r.delete, r.more_permissions,
         // dir.username 'director'
         // FROM drivers d

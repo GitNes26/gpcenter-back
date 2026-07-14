@@ -19,9 +19,9 @@ return new class extends Migration
         // SELECT u.id u_id, u.username, u.email, u.role_id, u.active,
         // CONCAT(vr.name,
         //         ' ',
-        //         vr.paternal_last_name,
+        //         vr.plast_name,
         //         ' ',
-        //         vr.maternal_last_name) AS full_name, vr.*,
+        //         vr.mlast_name) AS full_name, vr.*,
         // r.role, r.read, r.create, r.update, r.delete, r.more_permissions
         // FROM voucher_requesters vr
         // INNER JOIN users u ON vr.user_id=u.id

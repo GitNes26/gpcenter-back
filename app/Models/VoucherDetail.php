@@ -26,8 +26,8 @@ class VoucherDetail extends Model
         'employee_code',
         'department',
         'name',
-        'paternal_last_name',
-        'maternal_last_name',
+        'plast_name',
+        'mlast_name',
         'cellphone',
 
         'active',

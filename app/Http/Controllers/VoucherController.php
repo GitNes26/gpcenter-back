@@ -36,7 +36,7 @@ class VoucherController extends Controller
                     $all = true;
                 } else $list = VoucherView::whereIn('voucher_status', $values)->orderBy('id', 'desc')->get();
             }
-            Log::info($list);
+            // Log::info($list);
 
             // if ($year && !$all) {
             //     $list = $list->whereYear('created_at', $year);
@@ -125,8 +125,8 @@ class VoucherController extends Controller
             // $voucher->employee_code = $request->employee_code;
             // $voucher->department = $request->department;
             // $voucher->name = $request->name;
-            // $voucher->paternal_last_name = $request->paternal_last_name;
-            // $voucher->maternal_last_name = $request->maternal_last_name;
+            // $voucher->plast_name = $request->plast_name;
+            // $voucher->mlast_name = $request->mlast_name;
             // $voucher->cellphone = $request->cellphone;
             $voucher->activity = $request->activity;
             $voucher->voucher_status = $request->voucher_status;
