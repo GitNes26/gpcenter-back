@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmployeeDetails;
 use App\Models\ObjResponse;
 use App\Models\User;
 use App\Models\UserView;
@@ -265,7 +266,7 @@ class UserController extends Controller
          // $token = $request->bearerToken();
          $id = $request->id;
          $secondTable = null;
-         Log::info("el id: $id");
+         // Log::info("el id: $id");
          DB::beginTransaction();
 
          #VALIDACIÓN DE CAMPOS EN USER
@@ -276,6 +277,7 @@ class UserController extends Controller
          }
 
          $message_change_psw = "";
+
          # INSERT O UPDATE
          $user = User::find($id);
          if (!$user) $user = new User();
@@ -289,6 +291,7 @@ class UserController extends Controller
          }
          $user->role_id = $request->role_id;
          $user->gpc_employee_id = $request->gpc_employee_id;
+         $newFile = false;
 
          $allData = $request->except(['_token', '_method']);
          $allData['id'] = $request->gpc_employee_id;
@@ -305,28 +308,48 @@ class UserController extends Controller
                   'contents' => fopen($request->file($fileField)->getPathname(), 'r'),
                   'filename' => $request->file($fileField)->getClientOriginalName(),
                ];
+               $newFile = true;
             }
          }
-         // $gpcUrl = config('app.gpc_api_url', 'https://api.gpcentral.gomezpalacio.gob.mx/api');
          $this->gpcUrl .= '/employees/createOrUpdate';
-         Log::info($this->gpcUrl);
+         // Log::info($this->gpcUrl);
 
          try {
-            $forwarder = app(\App\Services\RequestForwarderService::class);
+            if ($newFile) {
+               // Log::info("el newFile: $newFile");
+               $forwarder = app(\App\Services\RequestForwarderService::class);
 
-            $response = $forwarder->forward(
-               request: $request,
-               url: $this->gpcUrl,
-               override: ['id' => $request->gpc_employee_id],
-               fileFields: ['avatar', 'signature_image', 'seal_image']
-            );
+               $gpcResponse = $forwarder->forward(
+                  request: $request,
+                  url: $this->gpcUrl,
+                  override: ['id' => $request->gpc_employee_id],
+                  fileFields: ['avatar', 'signature_image', 'seal_image']
+               );
 
-            Log::info('UserController ~ employees/createOrUpdate ~ Respuesta GPCentral: ' . $response->body());
+               // Log::info('UserController ~ employees/createOrUpdate ~ Respuesta GPCentral: ' . $gpcResponse->body());
+            }
          } catch (\Exception $e) {
             Log::warning("UserController ~ createOrUpdate ~ Enviado de Request a GPCentral fallida: " . $e->getMessage());
          }
 
          $user->save();
+
+         # EmployeeDetails - licencia, dirección, etc. (según requiera el rol)
+         $details = EmployeeDetails::where('gpc_employee_id', $user->gpc_employee_id)->first();
+         if (!$details) $details = new EmployeeDetails();
+         $details->gpc_employee_id = $user->gpc_employee_id;
+         if ($request->license_number) $details->license_number = $request->license_number;
+         if ($request->license_type) $details->license_type = $request->license_type;
+         if ($request->license_due_date) $details->license_due_date = $request->license_due_date;
+         // if ($request->community_id) $details->community_id = $request->community_id;
+         // if ($request->street) $details->street = $request->street;
+         // if ($request->num_ext) $details->num_ext = $request->num_ext;
+         // if ($request->num_int) $details->num_int = $request->num_int;
+         $details->save();
+
+         $this->ImageUp($request, "img_license", "GPCenter/employees", $details, "licencia", true, "noLicense", "gpc_employee_id");
+         // if ($request->hasFile('img_license')) $details->img_license = $img_license;
+         // $details->save();
 
          $response->data = ObjResponse::CorrectResponse();
 
@@ -361,11 +384,16 @@ class UserController extends Controller
          //    // ->select('users.*', 'roles.role', 'departments.department', 'departments.description as department_description')
          //    ->first();
 
-         $user = User::where('users.id', $request->id)
-            ->join("roles", "users.role_id", "=", "roles.id")
-            ->select("users.*", "roles.role", "roles.read", "roles.create", "roles.update", "roles.delete", "roles.more_permissions")
-            ->orderBy('users.id', 'desc')
+         // $user = User::where('users.id', $request->id)
+         //    ->join("roles", "users.role_id", "=", "roles.id")
+         //    ->select("users.*", "roles.role", "roles.read", "roles.create", "roles.update", "roles.delete", "roles.more_permissions")
+         //    ->orderBy('users.id', 'desc')
+         //    ->first();
+
+         $user = UserView::where('user_id', $request->id)
+            ->orderBy('user_id', 'desc')
             ->first();
+
 
 
          $response->data = ObjResponse::CorrectResponse();

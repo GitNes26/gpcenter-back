@@ -96,7 +96,7 @@ class VoucherRequesterController extends Controller
     * @param  \Illuminate\Http\Request $request
     * @return \Illuminate\Http\Response $response
     */
-   public function show(Request $request, Int $id, Response $response)
+   public function show(Int $id, Response $response)
    {
       $response->data = ObjResponse::DefaultResponse();
       try {

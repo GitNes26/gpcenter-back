@@ -39,23 +39,30 @@ class Controller extends BaseController
      * 
      * @return string
      */
-    public function ImageUp($request, $requestFileName, $dirPath, $model, $posFix, $create, $nameFake)
+    public function ImageUp($request, $requestFileName, $dirPath, $model, $posFix, $create, $nameFake, $idOptional = null)
     {
         try {
-            $dir = public_path($dirPath);
+            $dir = public_path("$dirPath");
             $img_name = "";
             if ($request->hasFile($requestFileName)) {
 
                 $img_file = $request->file($requestFileName);
-                $dir_path = "$dirPath/$model->id";
-                $destination = "$dir/$model->id";
-                $img_name = $this->ImgUpload($img_file, $destination, $dir_path, "$model->id-$posFix");
+                $dir_path = $idOptional ? "$dirPath/$model[$idOptional]" : "$dirPath/$model->id";
+                $timestamp = now()->format('Ymd');
+                $destination = $idOptional ? "$dir/$model[$idOptional]" : "$dir/$model->id";
+                $img_name = $this->ImgUpload(
+                    $img_file,
+                    $destination,
+                    $dir_path,
+                    $idOptional ? "$model[$idOptional]-$posFix-$timestamp" : "$model->id-$posFix-$timestamp"
+                );
             } else {
                 if ($create) $img_name = "$dirPath/$nameFake";
             }
 
             if ($request->hasFile($requestFileName)) {
-                $model->$requestFileName = $img_name;
+                Log::info($img_name);
+                $model->$requestFileName = asset($img_name);
                 $model->save();
             }
             // return $img_name;
@@ -80,25 +87,36 @@ class Controller extends BaseController
     {
         try {
             // return "ImgUpload->aqui todo bien";
-            $type = "JPG";
+            // $type = "JPG";
             $permissions = 0777;
 
-            if (file_exists("$dir/$imgName.PNG")) {
-                // Establecer permisos
-                if (chmod("$dir/$imgName.PNG", $permissions)) {
-                    @unlink("$dir/$imgName.PNG");
+            // if (file_exists("$dir/$imgName.PNG")) {
+            //     // Establecer permisos
+            //     if (chmod("$dir/$imgName.PNG", $permissions)) {
+            //         @unlink("$dir/$imgName.PNG");
+            //     }
+            //     $type = "JPG";
+            // } elseif (file_exists("$dir/$imgName.JPG")) {
+            //     // Establecer permisos
+            //     if (chmod("$dir/$imgName.JPG", $permissions)) {
+            //         @unlink("$dir/$imgName.JPG");
+            //     }
+            //     $type = "PNG";
+            // }
+            // $imgName = "$imgName.$type";
+            // $image->move($destination, $imgName);
+            // return "$dir/$imgName";
+            foreach (['PNG', 'JPG', 'JPEG', 'png', 'jpg', 'jpeg', 'avif', 'webp'] as $ext) {
+                $file = "$dir/$imgName.$ext";
+                if (file_exists($file)) {
+                    chmod($file, $permissions);
+                    @unlink($file);
                 }
-                $type = "JPG";
-            } elseif (file_exists("$dir/$imgName.JPG")) {
-                // Establecer permisos
-                if (chmod("$dir/$imgName.JPG", $permissions)) {
-                    @unlink("$dir/$imgName.JPG");
-                }
-                $type = "PNG";
             }
-            $imgName = "$imgName.$type";
-            $image->move($destination, $imgName);
-            return "$dir/$imgName";
+            $extension = $image->getClientOriginalExtension();
+            $fullName = "$imgName.$extension";
+            $image->move($destination, $fullName);
+            return "$dir/$fullName";
         } catch (\Error $err) {
             $msg = "error en imgUpload(): " . $err->getMessage();
             Log::error($msg);
