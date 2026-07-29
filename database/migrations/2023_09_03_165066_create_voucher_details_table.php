@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('voucher_id')->constrained('vouchers', 'id');
             $table->text('vehicle')->nullable();
             $table->text('vehicle_plates')->nullable();
-            $table->integer('requested_amount');
+            $table->integer('requested_amount')->nullable();
             $table->integer('employee_code')->nullable();
             $table->string('department')->nullable();
             $table->string('name');
