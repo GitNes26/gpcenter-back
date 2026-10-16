@@ -9,7 +9,7 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('gpCenter')->group(function () {
     Route::get('/', function () {
-        return 'API GPCenter v2.0.0.1';
+        return 'API GPCenter v2.0.0.2';
     });
     include_once "gpcenter.routes.php";
 });
