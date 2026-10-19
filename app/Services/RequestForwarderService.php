@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class RequestForwarderService
 {
+    public function __construct(private readonly GpCentralClient $gpCentral)
+    {
+    }
+
     /**
      * Reenvía el request completo (campos + archivos) a una URL remota.
      *
@@ -57,8 +60,9 @@ class RequestForwarderService
             'override' => $override,
         ]);
 
-        $response = Http::timeout($timeout)
-            ->withOptions(['verify' => false, 'multipart' => $multipart])
+        $response = $this->gpCentral->authenticatedRequest()
+            ->timeout($timeout)
+            ->withOptions(['multipart' => $multipart])
             ->send('POST', $url);
 
         if (!$response->successful()) {

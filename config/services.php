@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'gpcentral' => [
+        'base_url' => env('GPCENTRAL_BASE_URL', 'https://api.gpcentral.gomezpalacio.gob.mx'),
+        'client_id' => env('GPCENTRAL_CLIENT_ID'),
+        'api_key' => env('GPCENTRAL_API_KEY'),
+        'connect_timeout' => (int) env('GPCENTRAL_CONNECT_TIMEOUT', 5),
+        'timeout' => (int) env('GPCENTRAL_TIMEOUT', 15),
+    ],
+
 ];

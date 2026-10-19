@@ -11,9 +11,60 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\GpCentralClient;
+use Throwable;
 
 class EmployeeController extends Controller
 {
+   public function getByEmployeeCode(string $employeeCode, GpCentralClient $gpCentral)
+   {
+      if (!preg_match('/^[A-Za-z0-9._-]{1,50}$/', $employeeCode)) {
+         return response()->json([
+            'data' => array_merge(ObjResponse::DefaultResponse(), [
+               'status_code' => 422,
+               'message' => 'El número de empleado no tiene un formato válido.',
+               'alert_text' => 'Número de empleado inválido.',
+            ]),
+         ], 422);
+      }
+
+      try {
+         $centralResponse = $gpCentral->employeeByCode($employeeCode);
+         $payload = $centralResponse->json();
+
+         if (!is_array($payload)) {
+            throw new \RuntimeException('GP Central devolvió una respuesta inválida.');
+         }
+
+         // Un fallo de credencial entre servidores no debe cerrar la sesión humana de GPcenter.
+         $status = in_array($centralResponse->status(), [401, 403], true)
+            ? 502
+            : $centralResponse->status();
+
+         if ($status === 502) {
+            $payload = array_merge(ObjResponse::DefaultResponse(), [
+               'status_code' => 502,
+               'message' => 'No fue posible autenticar GPcenter con GP Central.',
+               'alert_text' => 'El servicio central no está disponible.',
+            ]);
+         }
+
+         return response()->json(['data' => $payload], $status);
+      } catch (Throwable $exception) {
+         Log::error('EmployeeController ~ getByEmployeeCode: fallo de integración', [
+            'error' => $exception->getMessage(),
+         ]);
+
+         return response()->json([
+            'data' => array_merge(ObjResponse::DefaultResponse(), [
+               'status_code' => 502,
+               'message' => 'No fue posible consultar GP Central.',
+               'alert_text' => 'El servicio central no está disponible.',
+            ]),
+         ], 502);
+      }
+   }
+
    /**
     * Mostrar lista de empleados activos del
     * uniendo con roles.

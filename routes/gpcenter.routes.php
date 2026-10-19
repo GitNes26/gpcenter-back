@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::prefix('employees')->group(function () {
         Route::get('/', [EmployeeController::class, 'index']);
+        Route::get('/getBy/employee_code/{employeeCode}', [EmployeeController::class, 'getByEmployeeCode']);
         Route::get('/id/{id}', [EmployeeController::class, 'show']);
         Route::get('/selectIndex', [EmployeeController::class, 'selectIndex']);
         Route::post('/create', [EmployeeController::class, 'createOrUpdate']);
